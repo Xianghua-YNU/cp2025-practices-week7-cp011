@@ -46,8 +46,9 @@ def process_image(input_file):
     large_filter = create_large_filter()  # 学生需要调用create_large_filter()
     
     # 3. 应用卷积 - 使用sim.convolve()函数
-    small_result = sim.convolve(img, small_filter)  # 学生需要实现小滤波器卷积读入的图像
-    large_result = sim.convolve(img, large_filter)  # 学生需要实现大滤波器卷积读入的图像
+    small_result = sim.convolve(img, small_filter)  
+    # 将第二个参数（小滤波器）作用在img（原始图像）上，即对每一个像素邻域与对应元素相乘再求和
+    large_result = sim.convolve(img, large_filter)  # 同上，但第二个参数为大滤波器
     
     # 4. 显示结果 - 使用matplotlib绘制对比图
     # 创建画布
