@@ -45,8 +45,8 @@
 ### 问题3: 参数曲面绘制结果
 
 *(插入图片或截图并简要分析三维曲面的特点)*![Figure 2025-04-09 111136 (3)](https://github.com/user-attachments/assets/67a24ff3-5f56-4ccb-8a8e-b20cabe60ead)
-
 随着xyz的变化，曲面螺旋上升，z方向大致为线性，xOy平面的投影是一个圆
+
 ---
 
 ## 五、实验总结与讨论
