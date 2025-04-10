@@ -29,7 +29,10 @@ def calculate_potential(X, Y):
     """
     # TODO 1: 实现电势计算
     # 提示: 计算每个点到正负电荷的距离，应用电势公式
-    pass
+    r_pos = np.sqrt((X - pos_charge_pos[0])**2 + (Y - pos_charge_pos[1])**2)
+    r_neg = np.sqrt((X - neg_charge_pos[0])**2 + (Y - neg_charge_pos[1])**2)
+    V = k * (q_pos / r_pos + q_neg / r_neg)
+    return V
 
 def calculate_electric_field(V, spacing):
     """
@@ -44,7 +47,8 @@ def calculate_electric_field(V, spacing):
     """
     # TODO 2: 实现电场计算
     # 提示: 使用np.gradient计算电势梯度，注意负号和参数顺序
-    pass
+    Ey, Ex = np.gradient(-V, spacing, spacing)
+    return Ex, Ey
 
 def main():
     """
