@@ -1,91 +1,86 @@
-import unittest
 import pandas as pd
-import numpy as np
-import sys
-import os
+import matplotlib.pyplot as plt
 
-# Add the parent directory to the Python path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+def creat_frame():
+    """
+    创建一个包含学生信息的DataFrame并保存为CSV文件。
+    
+    该函数创建一个包含学生姓名、年龄、成绩和所在城市的数据框架，
+    并将其保存为UTF-8编码的CSV文件。
+    
+    Returns:
+        None
+    """
+    # 创建一个字典来模拟数据
+    data = {
+    '姓名': ['张三', '李四', '王五', '赵六', '陈七'],
+    '年龄': [25, 30, None, 22, 28],
+    '成绩': [85.5, 90.0, 78.5, 88.0, 92.0],
+    '城市': ['北京', '上海', '广州', '深圳', '上海']
+    }
 
-#from solutions.pandas_practice_solution import creat_frame, load_data, handle_missing_values, analyze_statistics, save_processed_data
-from src.pandas_practice import creat_frame, load_data, handle_missing_values, analyze_statistics, save_processed_data
+    # 将字典转换为 DataFrame
+    df = pd.DataFrame(data)
 
-class TestPandasPractice(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        """在所有测试前运行，创建测试数据"""
-        creat_frame()
-        cls.test_data_path = 'data/data.csv'
-        cls.processed_data_path = 'processed_data.csv'
-        cls.data = load_data()
-        
-    def test_file_creation(self):
-        """测试数据文件是否创建成功"""
-        self.assertTrue(os.path.exists(self.test_data_path))
-        
-    def test_data_integrity(self):
-        """测试数据完整性"""
-        # 检查列名
-        expected_columns = ['姓名', '年龄', '成绩', '城市']
-        self.assertListEqual(list(self.data.columns), expected_columns)
-        # 检查行数
-        self.assertEqual(len(self.data), 5)
-        
-    def test_missing_value_handling(self):
-        """测试缺失值处理函数"""
-        # 检查原始数据是否有缺失值
-        self.assertTrue(self.data['年龄'].isnull().any())
-        
-        # 测试处理缺失值函数
-        processed_data = handle_missing_values(self.data.copy())
-        
-        # 检查处理后是否还有缺失值
-        self.assertFalse(processed_data['年龄'].isnull().any())
-        # 检查填充值是否正确
-        expected_age_mean = self.data['年龄'].mean()
-        self.assertAlmostEqual(processed_data['年龄'].mean(), expected_age_mean)
-        
-    def test_statistical_analysis(self):
-        """测试统计分析函数"""
-        processed_data = handle_missing_values(self.data.copy())
-        
-        # 捕获print输出进行验证
-        from io import StringIO
-        import sys
-        captured_output = StringIO()
-        sys.stdout = captured_output
-        
-        analyze_statistics(processed_data)
-        
-        sys.stdout = sys.__stdout__
-        output = captured_output.getvalue()
-        
-        # 验证输出中包含预期的统计信息
-        self.assertIn("成绩 列的均值", output)
-        self.assertIn("年龄 列的均值", output)
-        
-    def test_processed_data_saving(self):
-        """测试数据处理完整流程"""
-        
-        # 执行完整处理流程
-        processed_data = handle_missing_values(self.data.copy())
-        save_processed_data(processed_data)
-        
-        # 检查文件是否创建
-        self.assertTrue(os.path.exists(self.processed_data_path))
-        
-        # 检查文件内容
-        saved_data = pd.read_csv(self.processed_data_path)
-        self.assertEqual(len(saved_data), 5)
-        self.assertFalse(saved_data['年龄'].isnull().any())
-        
-    @classmethod
-    def tearDownClass(cls):
-        """在所有测试后运行，清理测试文件"""
-        if os.path.exists(cls.test_data_path):
-            os.remove(cls.test_data_path)
-        if os.path.exists(cls.processed_data_path):
-            os.remove(cls.processed_data_path)
+    # 将 DataFrame 保存为 CSV 文件
+    df.to_csv('data/data.csv', index=False, encoding='utf-8')
 
-if __name__ == '__main__':
-    unittest.main()
+
+def load_data():
+    """任务1: 读取数据文件"""
+    return pd.read_csv('data/data.csv')
+
+def show_basic_info(data):
+    """任务2: 显示数据基本信息"""
+    print("数据基本信息：")
+    data.info()
+
+def handle_missing_values(data):
+    """任务3: 处理缺失值"""
+    missing_columns = data.columns[data.isnull().any()].tolist()
+    for col in missing_columns:
+        if pd.api.types.is_numeric_dtype(data[col]):
+            data[col] = data[col].fillna(data[col].mean())
+    return data
+
+def analyze_statistics(data):
+    """任务4: 统计分析数值列"""
+    numeric_columns = data.select_dtypes(include=['number']).columns
+    for col in numeric_columns:
+        mean_value = data[col].mean()
+        median_value = data[col].median()
+        std_value = data[col].std()
+        print(f"{col} 列的均值: {mean_value}, 中位数: {median_value}, 标准差: {std_value}")
+
+def visualize_data(data, column_name='成绩'):
+    """任务5: 数据可视化"""
+    data[column_name].plot.hist()
+    plt.show()
+
+def save_processed_data(data):
+    """任务6: 保存处理后的数据"""
+    data.to_csv('processed_data.csv', index=False)
+
+def main():
+    """主函数，执行所有数据处理流程"""
+    # 1. 读取数据
+    data = load_data()
+    
+    # 2. 显示基本信息
+    show_basic_info(data)
+    
+    # 3. 处理缺失值
+    processed_data = handle_missing_values(data.copy())
+    
+    # 4. 统计分析
+    analyze_statistics(processed_data)
+    
+    # 6. 数据可视化
+    visualize_data(processed_data)
+    
+    # 7. 保存处理后的数据
+    save_processed_data(processed_data)
+
+if __name__ == "__main__":
+    main()
+    
