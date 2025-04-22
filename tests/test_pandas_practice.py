@@ -7,12 +7,7 @@ def create_frame():
     该函数创建一个包含学生姓名、年龄、成绩和所在城市的数据框架，
     并将其保存为UTF-8编码的csv文件。
     """
-    data = {
-        '姓名': ['张三', '李四', '王五', '赵六'],
-        '年龄': [18, 19, 20, 21],
-        '成绩': [85, 90, None, 88],
-        '城市': ['北京', '上海', '广州', '深圳']
-    }
+
     df = pd.DataFrame(data)
     df.to_csv('students.csv', index=False, encoding='utf-8')
 
