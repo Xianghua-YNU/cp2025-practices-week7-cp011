@@ -1,16 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def create_frame():
-    """
-    创建一个包含学生信息的DataFrame并保存为CSV文件。
-    该函数创建一个包含学生姓名、年龄、成绩和所在城市的数据框架，
-    并将其保存为UTF-8编码的csv文件。
-    """
-
-    df = pd.DataFrame(data)
-    df.to_csv('students.csv', index=False, encoding='utf-8')
-
 def load_data():
     """任务1：读取数据文件"""
     data = pd.read_csv('students.csv', encoding='utf-8')
@@ -59,7 +49,6 @@ def save_processed_data(data):
 
 def main():
     """主函数，执行所有数据处理流程"""
-    create_frame()
     data = load_data()
     show_basic_info(data)
     data = handle_missing_values(data)
@@ -69,5 +58,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-    
