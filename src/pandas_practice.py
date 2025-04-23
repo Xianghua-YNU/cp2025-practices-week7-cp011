@@ -23,12 +23,12 @@ def creat_frame():
     df = pd.DataFrame(data)
 
     # 将 DataFrame 保存为 CSV 文件
-    df.to_csv('../data/data.csv', index=False, encoding='utf-8')
+    df.to_csv('data/data.csv', index=False, encoding='utf-8')
 
 
 def load_data():
     """任务1: 读取数据文件"""
-    return pd.read_csv('../data/data.csv')
+    return pd.read_csv('data/data.csv')
 
 def show_basic_info(data):
     """任务2: 显示数据基本信息"""
