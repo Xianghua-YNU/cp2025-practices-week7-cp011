@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 def load_data():
     """任务1：读取数据文件"""
-    data = pd.read_csv('students.csv', encoding='utf-8')
+    data = pd.read_csv('../data/data.csv', encoding='utf-8')
     return data
 
 def show_basic_info(data):
