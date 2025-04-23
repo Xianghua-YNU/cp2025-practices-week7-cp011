@@ -1,60 +1,91 @@
+import unittest
 import pandas as pd
-import matplotlib.pyplot as plt
+import numpy as np
+import sys
+import os
 
-def load_data():
-    """任务1：读取数据文件"""
-    data = pd.read_csv('../data/data.csv', encoding='utf-8')
-    return data
+# Add the parent directory to the Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-def show_basic_info(data):
-    """任务2：显示数据基本信息"""
-    print("基本信息：")
-    print(data.info())
-    print("\n描述性统计：")
-    print(data.describe())
+#from solutions.pandas_practice_solution import creat_frame, load_data, handle_missing_values, analyze_statistics, save_processed_data
+from src.pandas_practice import creat_frame, load_data, handle_missing_values, analyze_statistics, save_processed_data
 
-def handle_missing_values(data):
-    """任务3：处理缺失值"""
-    # 找到缺失值列
-    missing_values = data.isnull().sum()
-    print("缺失值情况：")
-    print(missing_values)
-    # 填充缺失值
-    data['成绩'].fillna(data['成绩'].mean(), inplace=True)
-    return data
+class TestPandasPractice(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        """在所有测试前运行，创建测试数据"""
+        creat_frame()
+        cls.test_data_path = 'data/data.csv'
+        cls.processed_data_path = 'processed_data.csv'
+        cls.data = load_data()
+        
+    def test_file_creation(self):
+        """测试数据文件是否创建成功"""
+        self.assertTrue(os.path.exists(self.test_data_path))
+        
+    def test_data_integrity(self):
+        """测试数据完整性"""
+        # 检查列名
+        expected_columns = ['姓名', '年龄', '成绩', '城市']
+        self.assertListEqual(list(self.data.columns), expected_columns)
+        # 检查行数
+        self.assertEqual(len(self.data), 5)
+        
+    def test_missing_value_handling(self):
+        """测试缺失值处理函数"""
+        # 检查原始数据是否有缺失值
+        self.assertTrue(self.data['年龄'].isnull().any())
+        
+        # 测试处理缺失值函数
+        processed_data = handle_missing_values(self.data.copy())
+        
+        # 检查处理后是否还有缺失值
+        self.assertFalse(processed_data['年龄'].isnull().any())
+        # 检查填充值是否正确
+        expected_age_mean = self.data['年龄'].mean()
+        self.assertAlmostEqual(processed_data['年龄'].mean(), expected_age_mean)
+        
+    def test_statistical_analysis(self):
+        """测试统计分析函数"""
+        processed_data = handle_missing_values(self.data.copy())
+        
+        # 捕获print输出进行验证
+        from io import StringIO
+        import sys
+        captured_output = StringIO()
+        sys.stdout = captured_output
+        
+        analyze_statistics(processed_data)
+        
+        sys.stdout = sys.__stdout__
+        output = captured_output.getvalue()
+        
+        # 验证输出中包含预期的统计信息
+        self.assertIn("成绩 列的均值", output)
+        self.assertIn("年龄 列的均值", output)
+        
+    def test_processed_data_saving(self):
+        """测试数据处理完整流程"""
+        
+        # 执行完整处理流程
+        processed_data = handle_missing_values(self.data.copy())
+        save_processed_data(processed_data)
+        
+        # 检查文件是否创建
+        self.assertTrue(os.path.exists(self.processed_data_path))
+        
+        # 检查文件内容
+        saved_data = pd.read_csv(self.processed_data_path)
+        self.assertEqual(len(saved_data), 5)
+        self.assertFalse(saved_data['年龄'].isnull().any())
+        
+    @classmethod
+    def tearDownClass(cls):
+        """在所有测试后运行，清理测试文件"""
+        if os.path.exists(cls.test_data_path):
+            os.remove(cls.test_data_path)
+        if os.path.exists(cls.processed_data_path):
+            os.remove(cls.processed_data_path)
 
-def analyze_statistics(data):
-    """任务4：统计分析数值列"""
-    mean_score = data['成绩'].mean()
-    median_score = data['成绩'].median()
-    std_dev_score = data['成绩'].std()
-    print(f"成绩均值：{mean_score}")
-    print(f"成绩中位数：{median_score}")
-    print(f"成绩标准差：{std_dev_score}")
-
-def visualize_data(data, column_name='成绩'):
-    """任务5：数据可视化"""
-    plt.figure(figsize=(10, 6))
-    plt.hist(data[column_name], bins=5, color='blue', alpha=0.7)
-    plt.title(f'{column_name} 分布')
-    plt.xlabel(column_name)
-    plt.ylabel('频率')
-    plt.grid(True)
-    plt.show()
-
-def save_processed_data(data):
-    """任务6：保存处理后的数据"""
-    data.to_csv('processed_students.csv', index=False, encoding='utf-8')
-    print("处理后的数据已保存到 processed_students.csv")
-
-def main():
-    """主函数，执行所有数据处理流程"""
-    data = load_data()
-    show_basic_info(data)
-    data = handle_missing_values(data)
-    analyze_statistics(data)
-    visualize_data(data)
-    save_processed_data(data)
-
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    unittest.main()
